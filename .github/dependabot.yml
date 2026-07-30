@@ -1,0 +1,34 @@
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      go-deps:
+        patterns:
+          - "*"
+
+  - package-ecosystem: gomod
+    directory: /examples/entgo
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      example-go-deps:
+        patterns:
+          - "*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions-deps:
+        patterns:
+          - "*"
