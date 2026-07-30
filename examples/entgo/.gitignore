@@ -1,0 +1,4 @@
+# Ent generated code — recreate with `go generate ./...`.
+# Keep the schema (source of truth), ignore everything else under ent/.
+/ent/*
+!/ent/schema/
