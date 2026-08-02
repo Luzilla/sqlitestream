@@ -89,7 +89,7 @@ func TestSuite(t *testing.T) {
 	t.Run("restore", func(t *testing.T) {
 		t.Run("RequiresReplicaURL", func(t *testing.T) {
 			err := sqlitestream.Restore(t.Context(), filepath.Join(t.TempDir(), "out.db"), false)
-			require.Error(t, err)
+			require.ErrorIs(t, err, sqlitestream.ErrNotReplicating)
 			assert.Contains(t, err.Error(), "WithReplicaURL")
 		})
 
@@ -101,9 +101,13 @@ func TestSuite(t *testing.T) {
 
 			err := sqlitestream.Restore(t.Context(), path, false,
 				sqlitestream.WithReplicaURL("file:///nonexistent"))
-			require.Error(t, err)
-			assert.Contains(t, err.Error(), "exists")
+			require.ErrorIs(t, err, sqlitestream.ErrExists)
 		})
 
+		t.Run("EmptyReplica", func(t *testing.T) {
+			err := sqlitestream.Restore(t.Context(), filepath.Join(t.TempDir(), "out.db"), false,
+				sqlitestream.WithReplicaURL("file://"+t.TempDir()))
+			require.ErrorIs(t, err, sqlitestream.ErrReplicaEmpty)
+		})
 	})
 }
