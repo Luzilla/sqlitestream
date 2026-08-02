@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"time"
 
 	"github.com/benbjohnson/litestream"
 	"github.com/benbjohnson/litestream/s3" // also registers the s3:// scheme
@@ -62,6 +63,37 @@ func Open(ctx context.Context, path string, opts ...Option) (*DB, error) {
 // DB returns the underlying *sql.DB for use with Ent or database/sql.
 func (d *DB) DB() *sql.DB {
 	return d.sql
+}
+
+// Replicating reports whether background replication is configured.
+func (d *DB) Replicating() bool {
+	return d != nil && d.ldb != nil
+}
+
+// Retention reports whether litestream is handling retention.
+func (d *DB) Retention() bool {
+	return d != nil && d.ldb != nil && d.ldb.RetentionEnabled
+}
+
+// LastSyncedAt returns the time of the last successful sync to the
+// replica. The zero time means replication is off or nothing has been
+// synced yet.
+func (d *DB) LastSyncedAt() time.Time {
+	if d == nil || d.ldb == nil {
+		return time.Time{}
+	}
+	return d.ldb.LastSuccessfulSyncAt()
+}
+
+// SyncStatus reports the status between the local database and the
+// configured (cloud) storage by comparing transaction records. This
+// may entail I/O. Returns ErrNotReplicating when no replica is
+// configured.
+func (d *DB) SyncStatus(ctx context.Context) (litestream.SyncStatus, error) {
+	if d == nil || d.ldb == nil {
+		return litestream.SyncStatus{}, ErrNotReplicating
+	}
+	return d.ldb.SyncStatus(ctx)
 }
 
 // Close flushes any pending WAL to S3 (when replication is on), stops the
