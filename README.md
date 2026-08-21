@@ -31,6 +31,9 @@ replication.
 
 ## Replica URL
 
+> [!TIP]
+> While litestream supports an umbrella of cloud storages, this library uses AWS S3 compatible object storage only. Contributions to enable other backends, are very welcome.
+
 An S3 replica URL looks like:
 
 ```
@@ -50,6 +53,10 @@ s3://bucket/path?endpoint=http://127.0.0.1:9000&region=eu-central-1&forcePathSty
 
 - [`examples/plain`](examples/plain) — `database/sql`
 - [`examples/entgo`](examples/entgo) — [Ent](https://entgo.io)
+
+## Documentation
+
+Please see [docs](docs/).
 
 ## Development
 
